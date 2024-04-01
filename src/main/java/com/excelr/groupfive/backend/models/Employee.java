@@ -15,13 +15,11 @@ public class Employee {
     private String fullName;
     private String gender;
 
-    @ManyToOne
-    @JoinColumn(name = "department_id")
-    private Department department;
+    @Column(name = "department_id")
+    private Long departmentId;
 
-    @ManyToOne
-    @JoinColumn(name = "manager_id")
-    private Employee manager;
+    @Column(name = "manager_id")
+    private Long managerId;
 
     public Long getEmployeeId() {
         return employeeId;
@@ -71,19 +69,19 @@ public class Employee {
         this.gender = gender;
     }
 
-    public Department getDepartment() {
-        return department;
+    public Long getDepartmentId() {
+        return departmentId;
     }
 
-    public void setDepartment(Department department) {
-        this.department = department;
+    public void setDepartmentId(Long departmentId) {
+        this.departmentId = departmentId;
     }
 
-    public Employee getManager() {
-        return manager;
+    public Long getManagerId() {
+        return managerId;
     }
 
-    public void setManager(Employee manager) {
-        this.manager = manager;
+    public void setManagerId(Long managerId) {
+        this.managerId = managerId;
     }
 }
