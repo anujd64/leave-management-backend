@@ -1,89 +1,62 @@
 package com.excelr.groupfive.backend.models;
 
 import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
+
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 @Entity
 @Table(name = "employees")
-public class Employee {
+public class Employee implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long employeeId;
-
+    private String employeeId;
     private String username;
-    private String hashedPassword;
+    private String password;
     private String email;
     private String fullName;
     private String gender;
 
-    @ManyToOne
-    @JoinColumn(name = "department_id")
-    private Department department;
+    @Column(name = "department_id")
+    private Long departmentId;
 
-    @ManyToOne
-    @JoinColumn(name = "manager_id")
-    private Employee manager;
+    @Column(name = "manager_id")
+    private Long managerId;
 
-    public Long getEmployeeId() {
-        return employeeId;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
     }
 
-    public void setEmployeeId(Long employeeId) {
-        this.employeeId = employeeId;
+    @Override
+    public String getPassword() {
+        return this.password;
     }
 
-    public String getUsername() {
-        return username;
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
     }
 
-    public String getHashedPassword() {
-        return hashedPassword;
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
     }
 
-    public void setHashedPassword(String password) {
-        this.hashedPassword = password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public Department getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(Department department) {
-        this.department = department;
-    }
-
-    public Employee getManager() {
-        return manager;
-    }
-
-    public void setManager(Employee manager) {
-        this.manager = manager;
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

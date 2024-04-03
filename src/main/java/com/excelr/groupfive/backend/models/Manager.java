@@ -2,13 +2,23 @@ package com.excelr.groupfive.backend.models;
 
 import jakarta.persistence.*;
 
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 @Entity
 @Table(name = "managers")
-public class Manager {
+public class Manager implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long managerId;
-
+    private String managerId;
     private String username;
     private String hashedPassword;
     private String email;
@@ -18,51 +28,34 @@ public class Manager {
     @JoinColumn(name = "department_id")
     private Department department;
 
-    public Long getManagerId() {
-        return managerId;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
     }
 
-    public void setManagerId(Long managerId) {
-        this.managerId = managerId;
+    @Override
+    public String getPassword() {
+        return this.hashedPassword;
     }
 
-    public String getUsername() {
-        return username;
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
     }
 
-    public String getHashedPassword() {
-        return hashedPassword;
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
     }
 
-    public void setHashedPassword(String hashedPassword) {
-        this.hashedPassword = hashedPassword;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public Department getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(Department department) {
-        this.department = department;
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }
