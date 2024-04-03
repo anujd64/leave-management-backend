@@ -1,6 +1,14 @@
 package com.excelr.groupfive.backend.models;
 
 import jakarta.persistence.*;
+import lombok.*;
+
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 @Entity
 @Table(name = "leave_types")
 public class LeaveType {
@@ -10,29 +18,5 @@ public class LeaveType {
 
     private String leaveTypeName;
     private int defaultAllowance;
-
-    public Long getLeaveTypeId() {
-        return leaveTypeId;
-    }
-
-    public void setLeaveTypeId(Long leaveTypeId) {
-        this.leaveTypeId = leaveTypeId;
-    }
-
-    public String getLeaveTypeName() {
-        return leaveTypeName;
-    }
-
-    public void setLeaveTypeName(String leaveTypeName) {
-        this.leaveTypeName = leaveTypeName;
-    }
-
-    public int getDefaultAllowance() {
-        return defaultAllowance;
-    }
-
-    public void setDefaultAllowance(int defaultAllowance) {
-        this.defaultAllowance = defaultAllowance;
-    }
 
 }

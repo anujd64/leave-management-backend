@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface EmployeeRepository extends JpaRepository<Employee, Long> {
-    Employee findByUsernameAndHashedPassword(String username, String hashedPassword);
+public interface EmployeeRepository extends JpaRepository<Employee, String> {
+    Employee findByUsername(String username);
+    Employee findByEmail(String email);
 }

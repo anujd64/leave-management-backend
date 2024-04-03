@@ -1,13 +1,13 @@
 package com.excelr.groupfive.backend.models;
-import lombok.*;
 
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class LoginRequest {
+public class LoginResponse {
     private String username;
-    private String password;
+    private String jwtToken;
 }

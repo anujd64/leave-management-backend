@@ -7,7 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/employees")
@@ -24,7 +27,7 @@ public class EmployeeController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
+    public ResponseEntity<Employee> getEmployeeById(@PathVariable String id) {
         Employee employee = employeeService.getEmployeeById(id);
         if (employee != null) {
             return ResponseEntity.ok(employee);
@@ -33,14 +36,8 @@ public class EmployeeController {
         }
     }
 
-    @PostMapping
-    public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) {
-        Employee createdEmployee = employeeService.createEmployee(employee);
-        return new ResponseEntity<>(createdEmployee, HttpStatus.CREATED);
-    }
-
     @PutMapping("/{id}")
-    public ResponseEntity<Employee> updateEmployee(@PathVariable Long id, @RequestBody Employee employee) {
+    public ResponseEntity<Employee> updateEmployee(@PathVariable String id, @RequestBody Employee employee) {
         Employee updatedEmployee = employeeService.updateEmployee(id, employee);
         if (updatedEmployee != null) {
             return ResponseEntity.ok(updatedEmployee);
@@ -50,22 +47,8 @@ public class EmployeeController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteEmployee(@PathVariable String id) {
         employeeService.deleteEmployee(id);
         return ResponseEntity.ok().build();
     }
-
-    @PostMapping("/login")
-    public ResponseEntity<Employee> login(@RequestBody LoginRequest loginRequest) {
-        Employee employee = employeeService.authenticate(loginRequest.getUsername(), loginRequest.getPassword());
-        if (employee != null) {
-            employee.setHashedPassword(null);
-            return ResponseEntity.ok(employee);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-
-
 }
