@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+import java.util.UUID;
+
 
 @Getter
 @Setter
@@ -14,9 +16,7 @@ import lombok.*;
 @Table(name = "departments")
 public class Department {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long departmentId;
-
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID departmentId;
     private String departmentName;
-
 }
