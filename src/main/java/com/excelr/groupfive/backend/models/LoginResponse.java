@@ -1,6 +1,7 @@
 package com.excelr.groupfive.backend.models;
 
 import lombok.*;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
 @Setter
@@ -8,6 +9,6 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class LoginResponse {
-    private String username;
+    private UserDetails userDetails;
     private String jwtToken;
 }

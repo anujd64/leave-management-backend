@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.UUID;
 
 
 @Getter
@@ -17,18 +18,16 @@ import java.util.Collection;
 @Table(name = "employees")
 public class Employee implements UserDetails {
     @Id
-    private String employeeId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID employeeId;
     private String username;
     private String password;
     private String email;
     private String fullName;
     private String gender;
-
-    @Column(name = "department_id")
-    private Long departmentId;
-
-    @Column(name = "manager_id")
-    private Long managerId;
+    private Boolean isManager;
+    private UUID departmentId;
+    private UUID managerId;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

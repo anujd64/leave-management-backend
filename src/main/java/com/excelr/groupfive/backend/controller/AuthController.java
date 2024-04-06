@@ -23,6 +23,7 @@ import java.security.Principal;
 import java.util.UUID;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/auth")
 public class AuthController {
 
@@ -53,7 +54,7 @@ public class AuthController {
 
         String token = this.helper.generateToken(userDetails);
 
-        LoginResponse response = new LoginResponse(userDetails.getUsername(),token);
+        LoginResponse response = new LoginResponse(userDetails,token);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -68,7 +69,6 @@ public class AuthController {
         }
 
     }
-
     @PostMapping("/create-employee")
     public ResponseEntity<Object> createEmployee(@RequestBody Employee employee){
         Employee existingByUsername = employeeRepository.findByUsername(employee.getUsername());
@@ -96,7 +96,9 @@ public class AuthController {
 
             return ResponseEntity.badRequest().body(errorResponse);
         }
-        employee.setEmployeeId(UUID.randomUUID().toString());
+        if (employee.getIsManager()){
+            employee.setManagerId(null);
+        }
         employee.setPassword(passwordEncoder.encode(employee.getPassword()));
         employeeRepository.save(employee);
         return ResponseEntity.ok(employee);

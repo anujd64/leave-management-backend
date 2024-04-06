@@ -34,9 +34,14 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("employees/**").authenticated()
-                                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()                                .requestMatchers("auth/login-employee").permitAll()
-                                .requestMatchers("auth/create-employee").permitAll().anyRequest().authenticated()
+                        auth
+                        .requestMatchers("/employees/**").authenticated()
+                        .requestMatchers("/leaves/**").authenticated()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/auth/create-employee","/auth/login-employee","/company-holidays/all","/leave-types/all","/departments/all").permitAll()
+                        .requestMatchers("/company-holidays/**","/leave-types/**", "departments/**").authenticated()
+                        .requestMatchers("/auth/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(point))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
