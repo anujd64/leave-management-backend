@@ -16,11 +16,13 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -43,85 +45,60 @@ public class AuthController {
     private Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @Autowired
-    EmployeeRepository employeeRepository;
-
-    @Autowired
     PasswordEncoder passwordEncoder;
 
     @PostMapping("/login-employee")
     public ResponseEntity<Object> loginEmployee(@RequestBody LoginRequest request) {
+        UserDetails userDetails = employeeService.loadUserByUsername(request.getUsername());
 
-        boolean authenticated = this.doAuthenticate(request.getUsername(), request.getPassword());
-
-        if (authenticated){
-            UserDetails userDetails = employeeService.loadUserByUsername(request.getUsername());
-
-            String token = this.helper.generateToken(userDetails);
-
-            LoginResponse response = new LoginResponse(userDetails,token);
-
-            return new ResponseEntity<>(response, HttpStatus.OK);
+        if (userDetails != null) {
+            if (doAuthenticate(userDetails.getUsername(), request.getPassword())) {
+                String token = this.helper.generateToken(userDetails);
+                LoginResponse response = new LoginResponse(userDetails, token);
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else {
+                String errorMessage = "Invalid Password!";
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("errMsg", errorMessage));
+            }
+        } else {
+            String errorMessage = "Username doesn't exist!";
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("errMsg", errorMessage));
         }
-        String errorMessage ="Invalid Credentials!!";
-        Map<String, String> errorMap = new HashMap<>();
-        errorMap.put("errMsg", errorMessage);
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMap);
     }
-
 
     private boolean doAuthenticate(String username, String password) {
-
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, password);
-//        try {
-            Authentication authentication1 = manager.authenticate(authentication);
-            if(authentication1.isAuthenticated()){
-                return true;
-            }
-            return false;
-//        } catch (BadCredentialsException e) {
-//            throw new BadCredentialsException(" Invalid Username or Password  !!");
-//        }
-
+        UserDetails userDetails = employeeService.loadUserByUsername(username);
+        if (userDetails != null) {
+            return passwordEncoder.matches(password, userDetails.getPassword());
+        }
+        return false;
     }
+
     @PostMapping("/create-employee")
     public ResponseEntity<Object> createEmployee(@RequestBody Employee employee){
-        Employee existingByUsername = employeeRepository.findByUsername(employee.getUsername());
-        Employee existingByEmail = employeeRepository.findByEmail(employee.getEmail());
+        Boolean existingByUsername = employeeService.existsByUsername(employee.getUsername());
+        Boolean existingByEmail = employeeService.existsByEmail(employee.getEmail());
 
-        if (existingByUsername != null) {
-            // Handle duplicate username
+        if (existingByUsername) {
             String errorMessage = "Username '" + employee.getUsername() + "' already exists.";
 
-            ErrorResponse errorResponse = ErrorResponse.builder(
-                    new Exception(),
-                    HttpStatus.CONFLICT,
-                    errorMessage
-            ).build();
-            return ResponseEntity.badRequest().body(errorResponse);
-        } else if (existingByEmail != null) {
-            // Handle duplicate email
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Collections.singletonMap("errMsg", errorMessage));
+        } else if (existingByEmail) {
             String errorMessage = "Email '" + employee.getEmail() + "' already exists.";
 
-            ErrorResponse errorResponse = ErrorResponse.builder(
-                    new Exception(),
-                    HttpStatus.CONFLICT,
-                    errorMessage
-            ).build();
-
-            return ResponseEntity.badRequest().body(errorResponse);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Collections.singletonMap("errMsg", errorMessage));
         }
         if (employee.getIsManager()){
             employee.setManagerId(null);
+        }else{
+            Employee manager = employeeService.findByDepartmentIdAndIsManager(employee.getDepartmentId(),true);
+            employee.setManagerId(manager.getEmployeeId());
         }
         employee.setPassword(passwordEncoder.encode(employee.getPassword()));
-        employeeRepository.save(employee);
-        return ResponseEntity.ok(employee);
+        Employee employeeCreated = employeeService.createEmployee(employee);
+        return ResponseEntity.ok(employeeCreated);
     }
 
-    @ExceptionHandler(BadCredentialsException.class)
-    public String exceptionHandler() {
-        return "Credentials Invalid !!";
-    }
 
     @GetMapping("/current-user")
     public String getLoggedInUser(Principal principal) {

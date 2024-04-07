@@ -26,6 +26,12 @@ public class EmployeeController {
         return ResponseEntity.ok(employees);
     }
 
+    @GetMapping("/dept/{deptId}")
+    public ResponseEntity<List<Employee>> getAllEmployeesByDeptId(@PathVariable UUID deptId) {
+        List<Employee> employees = employeeService.findByDepartmentId(deptId);
+        return ResponseEntity.ok(employees);
+    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Employee> getEmployeeById(@PathVariable String id) {

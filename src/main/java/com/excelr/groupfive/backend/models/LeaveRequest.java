@@ -20,7 +20,7 @@ public class LeaveRequest {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID requestId;
     private UUID employeeId;
-    private String leaveTypeId;
+    private UUID leaveTypeId;
     private Date startDate;
     private Date endDate;
     private String status;
