@@ -14,12 +14,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -46,27 +49,38 @@ public class AuthController {
     PasswordEncoder passwordEncoder;
 
     @PostMapping("/login-employee")
-    public ResponseEntity<LoginResponse> loginEmployee(@RequestBody LoginRequest request) {
+    public ResponseEntity<Object> loginEmployee(@RequestBody LoginRequest request) {
 
-        this.doAuthenticate(request.getUsername(), request.getPassword());
+        boolean authenticated = this.doAuthenticate(request.getUsername(), request.getPassword());
 
-        UserDetails userDetails = employeeService.loadUserByUsername(request.getUsername());
+        if (authenticated){
+            UserDetails userDetails = employeeService.loadUserByUsername(request.getUsername());
 
-        String token = this.helper.generateToken(userDetails);
+            String token = this.helper.generateToken(userDetails);
 
-        LoginResponse response = new LoginResponse(userDetails,token);
+            LoginResponse response = new LoginResponse(userDetails,token);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        String errorMessage ="Invalid Credentials!!";
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("errMsg", errorMessage);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMap);
     }
 
-    private void doAuthenticate(String username, String password) {
+
+    private boolean doAuthenticate(String username, String password) {
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, password);
-        try {
-            manager.authenticate(authentication);
-        } catch (BadCredentialsException e) {
-            throw new BadCredentialsException(" Invalid Username or Password  !!");
-        }
+//        try {
+            Authentication authentication1 = manager.authenticate(authentication);
+            if(authentication1.isAuthenticated()){
+                return true;
+            }
+            return false;
+//        } catch (BadCredentialsException e) {
+//            throw new BadCredentialsException(" Invalid Username or Password  !!");
+//        }
 
     }
     @PostMapping("/create-employee")

@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173", allowedHeaders = {"authorization"})
 @RequestMapping("/leaves")
 public class LeaveRequestController {
 
@@ -28,7 +28,6 @@ public class LeaveRequestController {
         return ResponseEntity.ok(newLeaveRequest);
     }
 
-    @CrossOrigin(origins = "http://localhost:5173")
     @GetMapping("/by-empId/{empId}")
     public ResponseEntity<List<LeaveRequest>> getLeaveRequestByEmployeeId(@PathVariable UUID empId) {
         logger.info("empId in /empId "+ empId);
@@ -40,7 +39,6 @@ public class LeaveRequestController {
         }
     }
 
-    @CrossOrigin(origins = "http://localhost:5173")
     @GetMapping("/by-empId/{empId}/{status}")
     public ResponseEntity<List<LeaveRequest>> getLeaveRequestByEmployeeId(@PathVariable UUID empId, @PathVariable String status) {
         logger.info("empId in /empId/status "+ empId + " status " + status);
