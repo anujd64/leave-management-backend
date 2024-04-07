@@ -1,6 +1,8 @@
 package com.excelr.groupfive.backend.controller;
 
+import com.excelr.groupfive.backend.models.Employee;
 import com.excelr.groupfive.backend.models.LeaveRequest;
+import com.excelr.groupfive.backend.service.EmployeeService;
 import com.excelr.groupfive.backend.service.LeaveRequestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,17 +10,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173", allowedHeaders = {"authorization"})
+@CrossOrigin(origins = "http://localhost:5173", allowedHeaders = {"authorization","Content-Type"})
 @RequestMapping("/leaves")
 public class LeaveRequestController {
 
     @Autowired
     private LeaveRequestService leaveRequestService;
+
+    @Autowired
+    private EmployeeService employeeService;
 
     private Logger logger = LoggerFactory.getLogger(AuthController.class);
 
@@ -34,6 +37,26 @@ public class LeaveRequestController {
         List<LeaveRequest> leaveRequest = leaveRequestService.getLeavesByEmployeeId(empId);
         if (leaveRequest != null && !leaveRequest.isEmpty()) {
             return ResponseEntity.ok(leaveRequest);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/by-dept/{deptId}")
+    public ResponseEntity<Object> getLeaveRequestByDeptId(@PathVariable UUID deptId) {
+        List<Employee> employees = employeeService.findByDepartmentId(deptId);
+        Map<UUID,String> employeeIdUsernames = new HashMap<>();
+        List<LeaveRequest> leaveRequests = new ArrayList<>();
+        for (Employee employee: employees){
+            employeeIdUsernames.put(employee.getEmployeeId(),employee.getFullName());
+            leaveRequests.addAll(leaveRequestService.getLeavesByEmployeeId(employee.getEmployeeId()));
+        }
+        if (!leaveRequests.isEmpty()) {
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("employeeIdUsernames", employeeIdUsernames);
+            responseData.put("leaveRequests", leaveRequests);
+
+            return ResponseEntity.ok(responseData);
         } else {
             return ResponseEntity.notFound().build();
         }

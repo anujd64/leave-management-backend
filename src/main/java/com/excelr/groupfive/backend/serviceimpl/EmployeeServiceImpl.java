@@ -69,4 +69,39 @@ public class EmployeeServiceImpl implements EmployeeService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return employeeRepository.findByUsername(username);
     }
+
+    @Override
+    public List<Employee> findByDepartmentId(UUID deptId) {
+        return employeeRepository.findByDepartmentId(deptId);
+    }
+
+    @Override
+    public Employee findByUsername(String username) {
+        return employeeRepository.findByUsername(username);
+    }
+
+    @Override
+    public Employee findByEmail(String email) {
+        return employeeRepository.findByEmail(email);
+    }
+
+    @Override
+    public Employee findByDepartmentIdAndIsManager(UUID departmentId, boolean isManager) {
+        return employeeRepository.findByDepartmentIdAndIsManager(departmentId,isManager);
+    }
+
+    @Override
+    public Employee createEmployee(Employee employee) {
+        return employeeRepository.save(employee);
+    }
+
+    @Override
+    public Boolean existsByUsername(String username) {
+        return employeeRepository.existsByUsername(username);
+    }
+
+    @Override
+    public Boolean existsByEmail(String email) {
+        return employeeRepository.existsByEmail(email);
+    }
 }
