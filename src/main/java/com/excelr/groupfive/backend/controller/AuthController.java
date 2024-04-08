@@ -32,27 +32,23 @@ import java.util.UUID;
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private EmployeeService employeeService;
-
-    @Autowired
-    private AuthenticationManager manager;
-
-
-    @Autowired
-    private JwtHelper helper;
-
-    private Logger logger = LoggerFactory.getLogger(AuthController.class);
-
-    @Autowired
+    private final EmployeeService employeeService;
+    private final JwtHelper helper;
+    final
     PasswordEncoder passwordEncoder;
+
+    public AuthController(EmployeeService employeeService, AuthenticationManager manager, JwtHelper helper, PasswordEncoder passwordEncoder) {
+        this.employeeService = employeeService;
+        this.helper = helper;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @PostMapping("/login-employee")
     public ResponseEntity<Object> loginEmployee(@RequestBody LoginRequest request) {
         UserDetails userDetails = employeeService.loadUserByUsername(request.getUsername());
 
         if (userDetails != null) {
-            if (doAuthenticate(userDetails.getUsername(), request.getPassword())) {
+            if (doAuthenticate(userDetails.getUsername(), request.getPassword(), userDetails.getPassword())) {
                 String token = this.helper.generateToken(userDetails);
                 LoginResponse response = new LoginResponse(userDetails, token);
                 return new ResponseEntity<>(response, HttpStatus.OK);
@@ -66,12 +62,8 @@ public class AuthController {
         }
     }
 
-    private boolean doAuthenticate(String username, String password) {
-        UserDetails userDetails = employeeService.loadUserByUsername(username);
-        if (userDetails != null) {
-            return passwordEncoder.matches(password, userDetails.getPassword());
-        }
-        return false;
+    private boolean doAuthenticate(String username, String password, String realPassword) {
+            return passwordEncoder.matches(password, realPassword);
     }
 
     @PostMapping("/create-employee")
@@ -81,21 +73,35 @@ public class AuthController {
 
         if (existingByUsername) {
             String errorMessage = "Username '" + employee.getUsername() + "' already exists.";
-
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Collections.singletonMap("errMsg", errorMessage));
         } else if (existingByEmail) {
             String errorMessage = "Email '" + employee.getEmail() + "' already exists.";
-
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Collections.singletonMap("errMsg", errorMessage));
         }
         if (employee.getIsManager()){
             employee.setManagerId(null);
         }else{
             Employee manager = employeeService.findByDepartmentIdAndIsManager(employee.getDepartmentId(),true);
-            employee.setManagerId(manager.getEmployeeId());
+            if (manager == null){
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Collections.singletonMap("errMsg","This Department doesn't have a manager!"));
+            }else
+                employee.setManagerId(manager.getEmployeeId());
         }
+        String password = employee.getPassword();
         employee.setPassword(passwordEncoder.encode(employee.getPassword()));
         Employee employeeCreated = employeeService.createEmployee(employee);
+
+        UserDetails userDetails = employeeService.loadUserByUsername(employeeCreated.getUsername());
+
+        boolean auth = doAuthenticate(employeeCreated.getUsername(), password,userDetails.getPassword());
+
+        if (auth) {
+            String token = this.helper.generateToken(userDetails);
+            LoginResponse response = new LoginResponse(userDetails, token);
+            System.out.println("GENERATING TOKEN");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
         return ResponseEntity.ok(employeeCreated);
     }
 
