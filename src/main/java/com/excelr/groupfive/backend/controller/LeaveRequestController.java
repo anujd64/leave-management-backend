@@ -7,6 +7,7 @@ import com.excelr.groupfive.backend.service.LeaveRequestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +28,9 @@ public class LeaveRequestController {
 
     @PostMapping("/create-leave")
     public ResponseEntity<Object> createLeaveRequest(@RequestBody LeaveRequest leaveRequest){
+        if (leaveRequestService.existsByEmployeeIdAndStartDateAndEndDateAndStatus(leaveRequest.getEmployeeId(),leaveRequest.getStartDate(), leaveRequest.getEndDate(),leaveRequest.getStatus())){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Collections.singletonMap("errMsg","Similar Leave Request already exists!"));
+        }
         LeaveRequest newLeaveRequest = leaveRequestService.createLeaveRequest(leaveRequest);
         return ResponseEntity.ok(newLeaveRequest);
     }
@@ -45,15 +49,19 @@ public class LeaveRequestController {
     @GetMapping("/by-dept/{deptId}")
     public ResponseEntity<Object> getLeaveRequestByDeptId(@PathVariable UUID deptId) {
         List<Employee> employees = employeeService.findByDepartmentId(deptId);
-        Map<UUID,String> employeeIdUsernames = new HashMap<>();
+        Map<UUID,Object> employeeDetails = new HashMap<>();
         List<LeaveRequest> leaveRequests = new ArrayList<>();
         for (Employee employee: employees){
-            employeeIdUsernames.put(employee.getEmployeeId(),employee.getFullName());
+            Optional<List<LeaveRequest>> leaveRequestList = leaveRequestService.getLeaveByEmployeeIdAndStatus(employee.getEmployeeId(),"approved");
+            Map<String, Object> details = new HashMap<>();
+            details.put("fullName", employee.getFullName());
+            details.put("approvedLeaveCount", leaveRequestList.map(List::size).orElse(0));
+            employeeDetails.put(employee.getEmployeeId(), details);
             leaveRequests.addAll(leaveRequestService.getLeavesByEmployeeId(employee.getEmployeeId()));
         }
         if (!leaveRequests.isEmpty()) {
             Map<String, Object> responseData = new HashMap<>();
-            responseData.put("employeeIdUsernames", employeeIdUsernames);
+            responseData.put("employeeDetails", employeeDetails);
             responseData.put("leaveRequests", leaveRequests);
 
             return ResponseEntity.ok(responseData);
