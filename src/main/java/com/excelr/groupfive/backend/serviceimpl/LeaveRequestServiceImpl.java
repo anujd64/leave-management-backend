@@ -7,6 +7,7 @@ import com.excelr.groupfive.backend.service.LeaveRequestService;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -61,6 +62,11 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
         } else {
             return null; // or throw an exception
         }
+    }
+
+    @Override
+    public Boolean existsByEmployeeIdAndStartDateAndEndDateAndStatus(UUID empId,Date startDate, Date endDate,String status) {
+        return leaveRepository.existsByEmployeeIdAndStartDateAndEndDateAndStatus(empId,startDate, endDate,status);
     }
 
     private void updateLeaveRequestFields(LeaveRequest existingLeaveRequest, LeaveRequest updateLeaveRequest) throws IllegalAccessException {
