@@ -16,5 +16,6 @@ public interface LeaveRequestService {
     List<LeaveRequest> getLeavesByEmployeeId(UUID empId);
     LeaveRequest updateLeaveRequest(String id, LeaveRequest leaveRequest);
     Boolean existsByEmployeeIdAndStartDateAndEndDateAndStatus(UUID empId,Date startDate, Date endDate,String status);
+    Boolean existsOverlappingLeave(UUID employeeId, Date startDate, Date endDate);
     void deleteLeaveRequest(String id);
 }
