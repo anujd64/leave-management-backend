@@ -69,6 +69,10 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
         return leaveRepository.existsByEmployeeIdAndStartDateAndEndDateAndStatus(empId,startDate, endDate,status);
     }
 
+    public Boolean existsOverlappingLeave(UUID employeeId, Date startDate, Date endDate) {
+        List<LeaveRequest> overlappingLeaves = leaveRepository.findByEmployeeIdAndDateRange(employeeId, startDate, endDate);
+        return !overlappingLeaves.isEmpty();
+    }
     private void updateLeaveRequestFields(LeaveRequest existingLeaveRequest, LeaveRequest updateLeaveRequest) throws IllegalAccessException {
         for (Field field : LeaveRequest.class.getDeclaredFields()) {
             field.setAccessible(true);
