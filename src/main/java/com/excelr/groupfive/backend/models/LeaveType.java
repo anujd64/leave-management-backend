@@ -19,5 +19,6 @@ public class LeaveType {
     private UUID leaveTypeId;
     private String leaveTypeName;
     private int defaultAllowance;
+    private boolean docsRequired;
 
 }

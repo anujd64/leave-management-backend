@@ -3,6 +3,7 @@ package com.excelr.groupfive.backend.models;
 import jakarta.persistence.*;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import lombok.*;
@@ -26,6 +27,8 @@ public class LeaveRequest {
     private String status;
     private String managerFeedback;
     private String reason;
+    @ElementCollection
+    private List<String> images;
     private Date createdAt;
     private Date updatedAt;
 
