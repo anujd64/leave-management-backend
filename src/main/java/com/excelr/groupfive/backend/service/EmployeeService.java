@@ -10,9 +10,9 @@ import java.util.UUID;
 
 public interface EmployeeService extends UserDetailsService {
     List<Employee> getAllEmployees();
-    Employee getEmployeeById(String id);
-    Employee updateEmployee(String id, Employee employee);
-    void deleteEmployee(String id);
+    Employee getEmployeeById(UUID id);
+    Employee updateEmployee(UUID id, Employee employee);
+    void deleteEmployee(UUID id);
 
     List<Employee> findByDepartmentId(UUID deptId);
 

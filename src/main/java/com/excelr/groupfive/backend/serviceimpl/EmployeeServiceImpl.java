@@ -26,13 +26,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee getEmployeeById(String id) {
+    public Employee getEmployeeById(UUID id) {
         Optional<Employee> employeeOptional = employeeRepository.findById(id);
         return employeeOptional.orElse(null);
     }
 
     @Override
-    public Employee updateEmployee(String id, Employee employee) {
+    public Employee updateEmployee(UUID id, Employee employee) {
         Optional<Employee> existingEmployeeOptional = employeeRepository.findById(id);
         if (existingEmployeeOptional.isPresent()) {
             Employee existingEmployee = existingEmployeeOptional.get();
@@ -61,7 +61,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public void deleteEmployee(String id) {
+    public void deleteEmployee(UUID id) {
         employeeRepository.deleteById(id);
     }
 

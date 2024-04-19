@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173", allowedHeaders = {"authorization"})
+@CrossOrigin(origins = "http://localhost:5173", allowedHeaders = {"authorization", "content-type"})
 @RequestMapping("/employees")
 public class EmployeeController {
 
@@ -34,7 +34,7 @@ public class EmployeeController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<Employee> getEmployeeById(@PathVariable String id) {
+    public ResponseEntity<Employee> getEmployeeById(@PathVariable UUID id) {
         Employee employee = employeeService.getEmployeeById(id);
         if (employee != null) {
             return ResponseEntity.ok(employee);
@@ -44,7 +44,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Employee> updateEmployee(@PathVariable String id, @RequestBody Employee employee) {
+    public ResponseEntity<Employee> updateEmployee(@PathVariable UUID id, @RequestBody Employee employee) {
         Employee updatedEmployee = employeeService.updateEmployee(id, employee);
         if (updatedEmployee != null) {
             return ResponseEntity.ok(updatedEmployee);
@@ -54,7 +54,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEmployee(@PathVariable String id) {
+    public ResponseEntity<Void> deleteEmployee(@PathVariable UUID id) {
         employeeService.deleteEmployee(id);
         return ResponseEntity.ok().build();
     }
