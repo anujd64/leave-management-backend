@@ -28,9 +28,15 @@ public class LeaveRequestController {
 
     @PostMapping("/create-leave")
     public ResponseEntity<Object> createLeaveRequest(@RequestBody LeaveRequest leaveRequest){
-        if (leaveRequestService.existsByEmployeeIdAndStartDateAndEndDateAndStatus(leaveRequest.getEmployeeId(),leaveRequest.getStartDate(), leaveRequest.getEndDate(),leaveRequest.getStatus())){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(Collections.singletonMap("errMsg","Similar Leave Request already exists!"));
+        UUID employeeId = leaveRequest.getEmployeeId();
+        Date startDate = leaveRequest.getStartDate();
+        Date endDate = leaveRequest.getEndDate();
+
+        if (leaveRequestService.existsOverlappingLeave(employeeId, startDate, endDate)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Collections.singletonMap("errMsg", "Leave request overlaps with existing leaves!"));
         }
+
         LeaveRequest newLeaveRequest = leaveRequestService.createLeaveRequest(leaveRequest);
         return ResponseEntity.ok(newLeaveRequest);
     }
