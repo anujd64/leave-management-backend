@@ -106,4 +106,3 @@ public class LeaveRequestController {
         return ResponseEntity.ok().build();
     }
 }
-
