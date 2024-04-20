@@ -12,7 +12,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
     Employee findByEmail(String email);
 
     List<Employee> findByDepartmentId(UUID deptId);
-    Employee findByDepartmentIdAndIsManager(UUID deptId, Boolean isManager);
+    List<Employee> findByDepartmentIdAndIsManager(UUID deptId, Boolean isManager);
 
     Boolean existsByEmail(String email);
 

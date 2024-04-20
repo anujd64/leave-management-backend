@@ -22,10 +22,7 @@ import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
@@ -81,11 +78,11 @@ public class AuthController {
         if (employee.getIsManager()){
             employee.setManagerId(null);
         }else{
-            Employee manager = employeeService.findByDepartmentIdAndIsManager(employee.getDepartmentId(),true);
-            if (manager == null){
+            List<Employee> managerList = employeeService.findByDepartmentIdAndIsManager(employee.getDepartmentId(),true);
+            if (managerList.isEmpty()){
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Collections.singletonMap("errMsg","This Department doesn't have a manager!"));
             }else
-                employee.setManagerId(manager.getEmployeeId());
+                employee.setManagerId(managerList.get(0).getEmployeeId());
         }
         String password = employee.getPassword();
         employee.setPassword(passwordEncoder.encode(employee.getPassword()));
