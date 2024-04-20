@@ -20,7 +20,7 @@ public interface EmployeeService extends UserDetailsService {
 
     Employee findByEmail(String email);
 
-    Employee findByDepartmentIdAndIsManager(UUID departmentId, boolean isManager);
+    List<Employee> findByDepartmentIdAndIsManager(UUID departmentId, boolean isManager);
 
     Employee createEmployee(Employee employee);
 

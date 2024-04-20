@@ -86,7 +86,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee findByDepartmentIdAndIsManager(UUID departmentId, boolean isManager) {
+    public List<Employee> findByDepartmentIdAndIsManager(UUID departmentId, boolean isManager) {
         return employeeRepository.findByDepartmentIdAndIsManager(departmentId,isManager);
     }
 
